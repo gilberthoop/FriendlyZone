@@ -37,8 +37,17 @@
                     <nav>
                         <ul id="menu">
                             <li><a href="~/">Home</a></li>
+                            <!-- ENABLE ACCESS TO ACCOUNT AFTER LOG-IN -->
+                            @if (WebSecurity.IsAuthenticated) {
+                                <li><a href="~/Member">Member</a></li>
+                                <li><a href="~/Account/MyProfile">My Profile</a></li>
+                            }
                             <li><a href="~/About">About</a></li>
                             <li><a href="~/Contact">Contact</a></li>
+                            <!-- ADMIN ACCOUNT ACCESS ONLY -->
+                            @if (User.IsInRole("Admin")) {
+                                <li><a href="~/Admin">Admin</a></li>
+                            }
                         </ul>
                     </nav>
                 </div>

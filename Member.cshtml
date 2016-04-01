@@ -1,5 +1,9 @@
 ﻿@{
-    
+    // Check if user log-in is authenticated, if not redirect to the Log-in page
+    if (!WebSecurity.IsAuthenticated) {
+        Response.Redirect(@Href("~/Account/Login?returnUrl="+Request.Url.LocalPath));
+    }
+    Layout = "~/_SiteLayout.cshtml";
 }
 
 <!DOCTYPE html>
@@ -7,9 +11,35 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title></title>
+        <title>Members</title>
     </head>
     <body>
-        
+        <!-- TEXT FIELD FOR DISCUSSION-->
+        <form method="POST" action="">
+            <div>
+                <label>What are you doing?</label>
+                <input type="text" name="comment" style="height: 100px">
+            </div>
+            <div>
+                <input type="submit" name="postmessage" value="Post Message">
+            </div>
+        </form>
+
+        <!-- TABULAR FORM OF DISCUSSIONS-->
+        <table>
+                <tr>
+                    <th>Member picture</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>Comments</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <td><a href="https://www.google.ca">Follow</a></td>
+                </tr>
+        </table>
     </body>
 </html>
