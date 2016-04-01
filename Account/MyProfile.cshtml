@@ -1,0 +1,50 @@
+﻿@{
+    // Check if user log-in is authenticated, if not redirect to the Log-in page
+    if (!WebSecurity.IsAuthenticated) {
+        Response.Redirect(@Href("~/Account/Login?returnUrl="+Request.Url.LocalPath));
+    }
+    Layout = "~/_SiteLayout.cshtml";
+
+    <!-- WORK WITH DATA -->
+    var db = Database.Open("StarterSite");
+    //var userId = UrlData[1];
+    var selectQueryString = "SELECT * FROM UserProfile WHERE UserName='theGREEKfreak'";
+ }
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>My Profile</title>
+    </head>
+    <body>
+        <nav>
+            <ul id="menu">
+                <li><a href="~/Account/MyProfile">About Me</a></li>
+                <li><a href="~/Account/EditProfile">Edit Profile</a></li>
+            </ul>
+        </nav>
+
+        <!-- DISPLAY PROFILE INFO IN TABULAR FORM -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Member Since</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var data in db.Query(selectQueryString)) {
+                    <tr>
+                        <td>@data.UserName</td>
+                        <td>@data.Email</td>
+                        <td>@data.MemberSince</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+          
+    </body>
+</html>

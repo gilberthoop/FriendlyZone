@@ -1,0 +1,66 @@
+﻿@{
+    if (!WebSecurity.IsAuthenticated) {
+        Response.Redirect(@Href("~/Account/Login?returnUrl="+Request.Url.LocalPath));
+    }
+    Layout = "~/_SiteLayout.cshtml";
+
+    <!-- WORK WITH DATA -->
+    var db = Database.Open("StarterSite");
+    var userId = UrlData[0];
+
+    if(userId.IsEmpty()) {
+        Response.Redirect(@Href("~/Account/EditProfile"));
+    }
+
+    var selectQueryString = "SELECT * FROM UserProfile WHERE UserId=@0";
+    var row = db.QuerySingle(selectQueryString, userId);
+
+    var username = row.UserName;
+    var email = row.Email;
+
+    if (IsPost) {
+       username = Request["username"];
+       if (String.IsNullOrEmpty(username)) {
+           ModelState.AddError("username","Username name is required");
+       }
+
+       email = Request["email"];
+       if (String.IsNullOrEmpty(email)) {
+           ModelState.AddError("email","Email is required");
+       }
+
+       // insert data into database
+       if (ModelState.IsValid) {
+           var updateQueryString = "UPDATE UserProfile SET UserName=@0, Email=@1 WHERE UserId=@2";
+            db.Execute(updateQueryString,username,email,userId);
+            Response.Redirect(@Href("~/Account/MyProfile.cshtml"));
+       }
+    }
+    
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Update Profile</title>
+    </head>
+    <body>
+        <h1>Update Profile</h1>
+        <form method="POST" action="">
+            <fieldset>
+                <legend>Update Username</legend>
+                <div>
+                    <label for="username">Username</label>
+                    <input type="text" name="username" value="@username">
+                </div>
+                <div>
+                    <label for="email">Email</label>
+                    <input type="email" name="email" value="@email">
+                </div>
+                <input type="submit" value="Update Profile">
+            </fieldset>
+        </form>
+    </body>
+</html>
