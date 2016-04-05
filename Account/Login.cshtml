@@ -12,6 +12,7 @@
     var email = "";
     var password = "";
     var rememberMe = false;
+    var isloggedin = true;
 
     var returnUrl = Request.QueryString["ReturnUrl"];
     if (returnUrl.IsEmpty()) {
@@ -48,6 +49,18 @@
 
             // Attempt to log in using provided credentials
             if (WebSecurity.Login(email, password, rememberMe)) {
+                // TODO
+                // Set the IsLoggedIn Field to False when user logs out
+                isloggedin = false;
+                var db = Database.Open("StarterSite");
+              //  var userLoggedIn = db.QuerySingle("SELECT Email FROM UserProfile WHERE LOWER(Email) = LOWER(@0)", email);
+              //  db.Execute("UPDATE UserProfile SET IsLoggedIn=1 WHERE Email")          
+              //  db.Execute("INSERT INTO UserProfile (Email, UserName, IsLoggedIn) VALUES (@0, @1, @2)", email,username,isLoggedIn);
+                var updateQueryString = "UPDATE UserProfile SET IsLoggedIn=1 WHERE Email= '" + email + "' ";   
+                // ->NEVER DO THIS, PRONE TO SQL INJECTION
+                // Must prevent SQL injection atacks by using parameters
+                db.Execute(updateQueryString);
+
                 Context.RedirectLocal(returnUrl);
                 return;
             } else {

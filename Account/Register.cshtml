@@ -19,6 +19,7 @@
     var confirmEmail = "";
     var password = "";
     var confirmPassword = "";
+    var isLoggedIn = false;
 
     // Setup validation
     Validation.RequireField("userName", "Please enter your username");
@@ -42,6 +43,7 @@
         confirmEmail = Request.Form["confirmEmail"];
         password = Request.Form["password"];
         confirmPassword = Request.Form["confirmPassword"];
+        isLoggedIn = true;
 
         // Validate the user's captcha answer
         // if (!ReCaptcha.Validate("PRIVATE_KEY")) {
@@ -58,7 +60,7 @@
             if (user == null) {
                 // Insert email and username into the profile table
               //  db.Execute("INSERT INTO UserProfile (Email) VALUES (@0)", email);
-                db.Execute("INSERT INTO UserProfile (Email, UserName) VALUES (@0, @1)", email,username);
+                db.Execute("INSERT INTO UserProfile (Email, UserName, IsLoggedIn) VALUES (@0, @1, @2)", email,username,isLoggedIn);
                 var userResult = db.QuerySingle("SELECT * FROM UserProfile WHERE LOWER(Email) = LOWER(@0)", email);
                 var roleResult = db.QuerySingle("SELECT RoleId FROM webpages_Roles WHERE RoleName=@0","Member");
                 db.Execute("INSERT INTO webpages_UsersInRoles (UserId,RoleId) Values (@0,@1)", userResult.UserId,roleResult.RoleId);

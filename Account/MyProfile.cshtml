@@ -6,13 +6,24 @@
     Layout = "~/_SiteLayout.cshtml";
 
     <!-- WORK WITH DATA -->
-    var db = Database.Open("StarterSite");
-    //var userId = UrlData[1];
-    var selectQueryString = "SELECT * FROM UserProfile WHERE UserName='theGREEKfreak'";
+    var db = Database.Open("StarterSite"); 
+    var name = "";
+
+    var selectUserName = "SELECT UserName FROM UserProfile WHERE IsLoggedIn=1";
+    foreach(var getUser in db.Query(selectUserName)) {
+        name = getUser.UserName;
+    }
+    
+
+    var selectQueryString = "SELECT * FROM UserProfile WHERE UserName=@0";
+    var row = db.QuerySingle(selectQueryString,name);
+
+    var username = row.UserName;
+    var email = row.Email;
+    var memberSince = row.MemberSince;
  }
 
 <!DOCTYPE html>
-
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -22,7 +33,7 @@
         <nav>
             <ul id="menu">
                 <li><a href="~/Account/MyProfile">About Me</a></li>
-                <li><a href="~/Account/EditProfile">Edit Profile</a></li>
+                <li><a href="@Href("~/Account/EditProfile",name)">Edit Profile</a></li>
             </ul>
         </nav>
 
@@ -36,13 +47,11 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach(var data in db.Query(selectQueryString)) {
                     <tr>
-                        <td>@data.UserName</td>
-                        <td>@data.Email</td>
-                        <td>@data.MemberSince</td>
+                        <td>@username</td>
+                        <td>@email</td>
+                        <td>@memberSince</td>
                     </tr>
-                }
             </tbody>
         </table>
           

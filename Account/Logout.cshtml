@@ -5,6 +5,12 @@
         // Verify the request was submitted by the user
         AntiForgery.Validate();
 
+        // TODO
+        var db = Database.Open("StarterSite");
+        var updateQueryString = "UPDATE UserProfile SET IsLoggedIn=0";
+        db.Execute(updateQueryString);
+
+
         // Log out of the current user context
         WebSecurity.Logout();
 

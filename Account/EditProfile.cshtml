@@ -7,10 +7,10 @@
 
     <!-- WORK WITH DATA -->
     var db = Database.Open("StarterSite");
-    var userId = UrlData[0];
+    var name = UrlData[0];
 
-    var selectQueryString = "SELECT * FROM UserProfile WHERE UserId=@0";
-    var row = db.QuerySingle(selectQueryString, userId);
+    var selectQueryString = "SELECT * FROM UserProfile WHERE UserName=@0";
+    var row = db.QuerySingle(selectQueryString, name);
 
     var username = row.UserName;
     var email = row.Email;
@@ -28,7 +28,7 @@
         <nav>
             <ul id="menu">
                 <li><a href="~/Account/MyProfile">About Me</a></li>
-                <li><a href="~/Account/EditProfile">Edit Profile</a></li>
+                <li><a href="@Href("~/Account/EditProfile",name)">Edit Profile</a></li>
             </ul>
         </nav>
 
@@ -44,7 +44,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><a href="@Href("~/Account/UpdateProfile",@userId)">Edit/Update Profile</a></td>
+                    <td><a href="@Href("~/Account/UpdateProfile",name)">Edit/Update Profile</a></td>
                     <td>@username</td>
                     <td>@email</td>
                     <td>@memberSince</td>
