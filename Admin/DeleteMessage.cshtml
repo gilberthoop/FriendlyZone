@@ -1,0 +1,46 @@
+﻿@{
+    if (!WebSecurity.IsAuthenticated) {
+        Response.Redirect(@Href("~/Account/Login?returnUrl="+Request.Url.LocalPath));
+    }
+    if (!User.IsInRole("Admin")) {
+        Response.Redirect("~/404");
+    }
+     Layout = "~/_SiteLayout.cshtml";
+     var db = Database.Open("StarterSite");
+     var userID = UrlData[0];
+
+     if(userID.IsEmpty()) {
+         Response.Redirect(@Href("~/Admin"));
+     }
+
+     var row = db.QuerySingle("SELECT * FROM UserProfile WHERE UserId=@0", userID);
+
+     if (IsPost && !userID.IsEmpty()) {
+         var deleteMessage = "DELETE FROM MemberComments WHERE UserId=@0";
+        
+         
+         db.Execute(deleteMessage,userID);
+         
+        
+         Response.Redirect("~/Admin.cshtml");
+     }   
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+    </head>
+    <body>
+        <h1>Delete Message - Confirmation</h1>
+        
+        <form method="post" action="">
+            <p>Are you sure you want to delete the following Message? <br>
+                Name: <b>@row.Email </b>??? <br>
+            </p>
+            <p><input type="submit" value="Delete"></p>
+        </form>
+    </body>
+</html>

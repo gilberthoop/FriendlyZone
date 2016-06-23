@@ -41,11 +41,12 @@
 
             // Check if user already exists
             var user = db.QuerySingle("SELECT Email FROM UserProfile WHERE LOWER(Email) = LOWER(@0)", email);
+
+            // Check if user exists
             if (user == null) {
                 // Insert email into the profile table
                 db.Execute("INSERT INTO UserProfile (Email) VALUES (@0)", email);
                 OAuthWebSecurity.CreateOrUpdateAccount(provider, providerUserId, email);
-
                 OAuthWebSecurity.Login(provider, providerUserId, createPersistentCookie: false);
 
                 Context.RedirectLocal(returnUrl);

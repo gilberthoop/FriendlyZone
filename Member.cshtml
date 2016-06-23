@@ -3,7 +3,66 @@
     if (!WebSecurity.IsAuthenticated) {
         Response.Redirect(@Href("~/Account/Login?returnUrl="+Request.Url.LocalPath));
     }
-    Layout = "~/_SiteLayout.cshtml";
+    Layout = "~/_MainLayout.cshtml"; 
+    Page.Title = "Members";
+    
+        //Open the database
+        var db = Database.Open("StarterSite");
+
+        //Initalize variables
+        var id = 0;
+        var UserId = 0;
+        var Time = DateTime.Now;
+        var Message = "";
+        var posts = 0;
+
+        // Select the user's id who is currently logged in and set to a variable
+        var selectId = "SELECT UserId FROM UserProfile WHERE IsLoggedIn = 1";
+        foreach(var getId in db.Query(selectId)) {
+            id = getId.UserId;
+        }
+
+        // Select the user's total posts and set to a variable
+        var selectPosts = "SELECT TotalPosts FROM (UserProfile JOIN MemberComments ON UserProfile.UserId=MemberComments.UserId) WHERE IsLoggedIn = 1";
+        foreach(var info in db.Query(selectPosts)) {
+            posts = info.TotalPosts;
+        }
+
+        // Select all the users from the joined tables and set each value of variable
+        var selectQueryString = "SELECT * FROM (MemberComments JOIN UserProfile ON MemberComments.UserId=UserProfile.UserId)" +
+                                "ORDER BY Time DESC";
+        foreach(var getUsers in db.Query(selectQueryString)) {
+            UserId = getUsers.UserId;
+            Time = getUsers.Time;
+            Message = getUsers.Message;
+        }
+         
+         
+        // Initialize variables for writing comments to database
+        var user = id;
+        var time = DateTime.Now;
+        var message = Request["comment"];
+        var totalPosts = posts;
+
+
+        if(IsPost) {
+            if(ModelState.IsValid){ 
+                    // Increment that user total post after submit
+                    totalPosts++;
+                
+                    //Insert the comment into the database
+                    var insertQuery = "INSERT INTO MemberComments (UserId, Time, Message, TotalPosts)" +
+                            "VALUES (@0, @1, @2, @3)";
+                    db.Execute(insertQuery, user, time, message, totalPosts);
+
+                    // Update the total count of messages
+                    var updateQueryString = "UPDATE MemberComments SET TotalPosts=@0 WHERE UserId=@1";
+                    db.Execute(updateQueryString, totalPosts, user); 
+
+                    // Redirect to the same page (i.e. refresh the page)
+                    Response.Redirect(@Href("~/Member.cshtml")); 
+                } 
+        }
 }
 
 <!DOCTYPE html>
@@ -11,35 +70,85 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>Members</title>
+        <title>@Page.Title</title>
     </head>
     <body>
-        <!-- TEXT FIELD FOR DISCUSSION-->
-        <form method="POST" action="">
-            <div>
-                <label>What are you doing?</label>
-                <input type="text" name="comment" style="height: 100px">
+        <div class="container">  
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="content">
+                        @{
+                            var test = "";  
+                        }
+                        <!-- TEXT INPUT FIELD FOR DISCUSSION-->
+                        <form method="POST">
+                            <div class="text-comment"> 
+                                <input type="text" name="comment" placeholder="What are you doing?" style="height: 100px; width: 500px">
+                                <br><br>
+                            </div>
+                            <div>
+                                @{ test = "false"; }
+                                <input type="hidden" name="test" value="@test">
+                                <input type="submit" name="postmessage" value="Post Message">
+                            </div>
+                        </form>
+                        <hr>
+                        <!-- MOST FOLLOWED TRACKER -->
+                        <div id="follow">
+                            <p><img src="~/Images/gold_star.png" alt="gold star" height="30" width="35"><b>Most Followed:</b>
+                             @{
+                                var mostFollowed = "";
+                                var selectMostFollowed = "SELECT UserName FROM (MemberComments JOIN UserProfile ON MemberComments.UserId=UserProfile.UserId)" +
+                                                            "JOIN Followers ON Followers.UserId=UserProfile.UserId ORDER BY FollowCount"; 
+                                foreach(var getFollowed in db.Query(selectMostFollowed)) {
+                                    mostFollowed = getFollowed.UserName;
+                                }
+                             }
+                                @mostFollowed 
+                            </p>
+                            <p><img src="~/Images/trophy_icon.png" alt="trophy" height="30" width="30"><b>Top Contributor:</b>
+                             @{  
+                                 //Calculate and select the top contributor by username
+                                var topContributor = ""; 
+                                var selectPost = "SELECT UserName FROM (MemberComments JOIN UserProfile ON MemberComments.UserId=UserProfile.UserId) ORDER BY TotalPosts";
+                                 foreach(var getPost in db.Query(selectPost)) {
+                                    topContributor = getPost.UserName;
+                                }
+                             }
+                                @topContributor
+                            </p>
+                        </div>  
+                    </div> 
+                </div>
             </div>
-            <div>
-                <input type="submit" name="postmessage" value="Post Message">
+            <div class="table-member-info">
+             <!-- TABULAR FORM OF DISCUSSIONS-->
+            <table>
+                    <tr>
+                        <th>Member picture</th>
+                        <th>Name</th>
+                        <th>Time</th> 
+                        <th>Comments</th>
+                        <th>&nbsp;</th> 
+                    </tr>
+                @foreach(var row in db.Query(selectQueryString)) {
+                    var imagePath = Request.ApplicationPath + row.ProfilePicture;
+                    <tr>
+                        <td><img src="@imagePath" class="dp" alt="@row.UserName"></td>
+                        <td>@row.UserName</td>
+                        <td>@row.Time</td>
+                        <td>@row.Message</td>
+                        <td> 
+                            <form id="following" action="~/FollowMe/@row.UserId" method="POST"> 
+                                @AntiForgery.GetHtml()
+                                <a href="javascript:document.getElementById('following').submit()">Follow</a>  
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </table>
             </div>
-        </form>
-
-        <!-- TABULAR FORM OF DISCUSSIONS-->
-        <table>
-                <tr>
-                    <th>Member picture</th>
-                    <th>&nbsp;</th>
-                    <th>&nbsp;</th>
-                    <th>&nbsp;</th>
-                    <th>&nbsp;</th>
-                    <th>Comments</th>
-                    <th>&nbsp;</th>
-                    <th>&nbsp;</th>
-                    <th>&nbsp;</th>
-                    <th>&nbsp;</th>
-                    <td><a href="https://www.google.ca">Follow</a></td>
-                </tr>
-        </table>
+        </div>
+        
     </body>
 </html>

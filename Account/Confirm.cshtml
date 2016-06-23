@@ -1,5 +1,5 @@
 ﻿@{
-    Layout = "~/_SiteLayout.cshtml";
+    Layout = "~/_MainLayout.cshtml";
     Page.Title = "Registration Confirmation Page";
 
     string message = "";
@@ -13,26 +13,35 @@
             message = "Could not confirm your registration info.";
         }
     }
-}
+} 
 
-<hgroup class="title">
-    <h1>@Page.Title.</h1>
-    <h2>Use the form below to confirm your account.</h2>
-</hgroup>
 
-@if (!message.IsEmpty()) {
-    <p>@message</p>
-} else {
-    <form method="post">
-        <fieldset>
-            <legend>Confirmation Code</legend>
-            <ol>
-                <li>
-                    <label for="confirmationCode">Confirmation code</label>
-                    <input type="text" id="confirmationCode" name="confirmationCode" />
-                </li>
-            </ol>
-            <input type="submit" value="Confirm" />
-        </fieldset>
-    </form>
-}
+<div class="container">
+   <div class="row">
+      <div class="col-lg-12">
+         <div class="content">
+             <h1>@Page.Title.</h1>
+             <hr>
+             <i class="fa fa-users" style="font-size: 100px"></i>
+             <h2>Use the form below to confirm your account.</h2>
+             
+                @if (!message.IsEmpty()) {
+                    <p>@message</p>
+                } else {
+                    <form method="post">
+                        <fieldset> 
+                           <div>
+                               <label for="confirmationCode">Confirmation code</label>
+                               <input type="text" id="confirmationCode" name="confirmationCode" />
+                           </div>
+                            <br><br> 
+                            <div>
+                                <input type="submit" value="Confirm" />
+                            </div>
+                        </fieldset>
+                    </form>
+                }
+         </div>
+      </div>
+   </div>
+</div>

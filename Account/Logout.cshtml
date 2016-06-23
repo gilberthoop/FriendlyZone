@@ -5,7 +5,7 @@
         // Verify the request was submitted by the user
         AntiForgery.Validate();
 
-        // TODO
+        // Set the IsLoggedIn column value to false for all users to ensure all users are logged out
         var db = Database.Open("StarterSite");
         var updateQueryString = "UPDATE UserProfile SET IsLoggedIn=0";
         db.Execute(updateQueryString);

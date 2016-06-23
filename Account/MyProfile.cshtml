@@ -3,17 +3,17 @@
     if (!WebSecurity.IsAuthenticated) {
         Response.Redirect(@Href("~/Account/Login?returnUrl="+Request.Url.LocalPath));
     }
-    Layout = "~/_SiteLayout.cshtml";
+    Layout = "~/_MainLayout.cshtml";
+    Page.Title = "My Profile";
 
     <!-- WORK WITH DATA -->
     var db = Database.Open("StarterSite"); 
-    var name = "";
+    var name = ""; 
 
     var selectUserName = "SELECT UserName FROM UserProfile WHERE IsLoggedIn=1";
     foreach(var getUser in db.Query(selectUserName)) {
-        name = getUser.UserName;
+        name = getUser.UserName; 
     }
-    
 
     var selectQueryString = "SELECT * FROM UserProfile WHERE UserName=@0";
     var row = db.QuerySingle(selectQueryString,name);
@@ -21,39 +21,50 @@
     var username = row.UserName;
     var email = row.Email;
     var memberSince = row.MemberSince;
+    var imagePath = Request.ApplicationPath + row.ProfilePicture;
+    
  }
 
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>My Profile</title>
+        <title>@Page.Title</title>
     </head>
-    <body>
-        <nav>
-            <ul id="menu">
-                <li><a href="~/Account/MyProfile">About Me</a></li>
-                <li><a href="@Href("~/Account/EditProfile",name)">Edit Profile</a></li>
-            </ul>
-        </nav>
-
-        <!-- DISPLAY PROFILE INFO IN TABULAR FORM -->
-        <table>
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Member Since</th>
-                </tr>
-            </thead>
-            <tbody>
-                    <tr>
-                        <td>@username</td>
-                        <td>@email</td>
-                        <td>@memberSince</td>
-                    </tr>
-            </tbody>
-        </table>
-          
-    </body>
+  <body>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="content"> 
+                    <h1>My Profile</h1>
+                    <h3>@username</h3>
+                    <div>
+                        <img src="@imagePath" alt="@username" class="dp">
+                    </div>
+                    <br><a href="@Href("~/Account/UpdateProfile",name)">Edit/Update Profile</a>
+                    <hr> 
+                    <!-- DISPLAY PROFILE INFO IN TABULAR FORM -->
+                    <div class="table-info">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Member Since</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    <tr>
+                                        <td>@username</td>
+                                        <td>@email</td>
+                                        <td>@memberSince</td>
+                                    </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                 </div>
+              </div>
+           </div>
+       </div>
+   </body>
 </html>

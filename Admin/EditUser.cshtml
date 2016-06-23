@@ -1,0 +1,57 @@
+﻿@{
+    if (!WebSecurity.IsAuthenticated) {
+        Response.Redirect(@Href("~/Account/Login?returnUrl="+Request.Url.LocalPath));
+    }
+    if (!User.IsInRole("Admin")) {
+        Response.Redirect("~/404");
+    }
+    Layout = "~/_SiteLayout.cshtml";
+    
+    var db = Database.Open("StarterSite");
+    var userID = UrlData[0];
+
+    if(userID.IsEmpty()) {
+        Response.Redirect(@Href("~/Admin"));
+    }
+    var selectQueryString = "SELECT * FROM UserProfile WHERE UserId=@0";
+    var row = db.QuerySingle(selectQueryString,userID); 
+
+    var UserName = row.UserName;
+    var UserID = row.UserId;
+
+       if (IsPost) {
+       UserName = Request["username"];
+       if (String.IsNullOrEmpty(UserName)) {
+           ModelState.AddError("UserName","UserName is required");
+       }
+
+       // insert data into database
+       if (ModelState.IsValid) {
+           var updateQueryString = "UPDATE UserProfile SET UserName=@0 WHERE UserId=@1";
+            db.Execute(updateQueryString,UserName,UserID);
+            Response.Redirect(@Href("~/Admin.cshtml"));
+       }
+   }
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+    </head>
+    <body>
+        <h1>Update Users</h1>
+        <form method="post" action=""> <!--use empty field if the same page will be procesing the form-->
+            <fieldset>
+                <legend>Update Users</legend>
+                <div>
+                    <label for="username">UserName</label>
+                    <input type="text" name="username" value="@UserName">
+                </div>
+                <input type="submit" value="Update User">
+            </fieldset>
+        </form>
+    </body>
+</html>

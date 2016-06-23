@@ -1,0 +1,23 @@
+﻿@{  
+    var db = Database.Open("StarterSite");
+    var selectInfo = "SELECT DISTINCT UserName, TotalPosts FROM (MemberComments JOIN UserProfile ON MemberComments.UserId=UserProfile.UserId)";
+    var data = db.Query(selectInfo); 
+    var myChart = new Chart(width: 600, height: 400, theme:ChartTheme.Green);
+        myChart.AddTitle("Number of Posts Per User");
+        myChart.DataBindTable(dataSource: data, xField: "UserName");
+        myChart.Write(); 
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+    </head>
+    <body>
+        
+    </body>
+</html>
+
+

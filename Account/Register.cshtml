@@ -5,13 +5,18 @@
 }
 
 @{
-    Layout = "~/_SiteLayout.cshtml";
+    Layout = "~/_MainLayout.cshtml";
     Page.Title = "Register";
 
     /* 
+        ADMIN
         EMAIL: williamgo@sample.com
         PASSWORD: samplepassword
     */ 
+
+    /*
+        TO INCLUDE IMAGE IN THE DATABASE, STORE THE IMAGE PATH, THEN ACCESS FROM THE IMAGE FOLDER (BY REFERING)
+    */
 
     // Initialize general page variables
     var username = "";
@@ -19,6 +24,7 @@
     var confirmEmail = "";
     var password = "";
     var confirmPassword = "";
+    var profilePicture = "";
     var isLoggedIn = false;
 
     // Setup validation
@@ -43,24 +49,26 @@
         confirmEmail = Request.Form["confirmEmail"];
         password = Request.Form["password"];
         confirmPassword = Request.Form["confirmPassword"];
+        profilePicture = "Images/default-profile.png";
         isLoggedIn = true;
 
         // Validate the user's captcha answer
-        // if (!ReCaptcha.Validate("PRIVATE_KEY")) {
-        //     ModelState.AddError("recaptcha", "Captcha response was not correct");
-        // }
+         if (!ReCaptcha.Validate("6Ld4XB0TAAAAAB4x1GuYaHKhYtMMiU-3LSUxCTEe")) {
+             ModelState.AddError("recaptcha", "Captcha response was not correct");
+         }
 
         // If all information is valid, create a new account
-        if (Validation.IsValid()) {
+        if (Validation.IsValid() && ModelState.IsValid) {
             // Insert a new user into the database
             var db = Database.Open("StarterSite");
 
+
             // Check if user already exists
             var user = db.QuerySingle("SELECT Email FROM UserProfile WHERE LOWER(Email) = LOWER(@0)", email);
-            if (user == null) {
-                // Insert email and username into the profile table
-              //  db.Execute("INSERT INTO UserProfile (Email) VALUES (@0)", email);
-                db.Execute("INSERT INTO UserProfile (Email, UserName, IsLoggedIn) VALUES (@0, @1, @2)", email,username,isLoggedIn);
+            if (user == null) { 
+                // Insert email, username, and default profile picture into the profile table
+                db.Execute("INSERT INTO UserProfile (Email, UserName, IsLoggedIn, ProfilePicture) VALUES (@0, @1, @2, @3)",
+                                email, username, isLoggedIn, profilePicture);
                 var userResult = db.QuerySingle("SELECT * FROM UserProfile WHERE LOWER(Email) = LOWER(@0)", email);
                 var roleResult = db.QuerySingle("SELECT RoleId FROM webpages_Roles WHERE RoleName=@0","Member");
                 db.Execute("INSERT INTO webpages_UsersInRoles (UserId,RoleId) Values (@0,@1)", userResult.UserId,roleResult.RoleId);
@@ -101,67 +109,73 @@
             }
         }
     }
-}
+} 
 
-<hgroup class="title">
-    <h1>@Page.Title.</h1>
-    <h2>Create a new account.</h2>
-</hgroup>
-
-<form method="post">
-    @AntiForgery.GetHtml()
-    @* If at least one validation error exists, notify the user *@
-    @Html.ValidationSummary("Account creation was unsuccessful. Please correct the errors and try again.", excludeFieldErrors: true, htmlAttributes: null)
-
-    <fieldset>
-        <legend>Registration Form</legend>
-        <ol>
-            <li class="userName">
-                <label for="username" @if(!ModelState.IsValidField("username")) {<text>class="error-label"</text>}>Username</label>
-                <input type="text" id="username" name="username" value="@username" @Validation.For("username") />
-                @*Write  any username validation errors to the page *@
-                @Html.ValidationMessage("username");
-            </li>
-            <li class="email">
-                <label for="email" @if(!ModelState.IsValidField("email")){<text>class="error-label"</text>}>Email address</label>
-                <input type="text" id="email" name="email" value="@email" @Validation.For("email") />
-                @* Write any email validation errors to the page *@
-                @Html.ValidationMessage("email")
-            </li>
-            <li class="confirm-email">
-                <label for="confirmEmail" @if(!ModelState.IsValidField("confirmEmail")) {<text>class="error-label"</text>}>Confirm email</label>
-                <input type="text" id="confirmEmail" name="confirmEmail" @Validation.For("confirmEmail") />
-                @* Write any password validation errors to the page *@
-                @Html.ValidationMessage("confirmEmail")
-            </li>
-            <li class="password">
-                <label for="password" @if(!ModelState.IsValidField("password")) {<text>class="error-label"</text>}>Password</label>
-                <input type="password" id="password" name="password" @Validation.For("password") />
-                @* Write any password validation errors to the page *@
-                @Html.ValidationMessage("password")
-            </li>
-            <li class="confirm-password">
-                <label for="confirmPassword" @if(!ModelState.IsValidField("confirmPassword")) {<text>class="error-label"</text>}>Confirm password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" @Validation.For("confirmPassword") />
-                @* Write any password validation errors to the page *@
-                @Html.ValidationMessage("confirmPassword")
-            </li>
-            <li class="recaptcha">
-                <div class="message-info">
-                    <p>
-                        To enable CAPTCHA verification, <a href="http://go.microsoft.com/fwlink/?LinkId=204140">install the 
-                        ASP.NET Web Helpers Library</a> and uncomment ReCaptcha.GetHtml and replace 'PUBLIC_KEY'
-                        with your public key. At the top of this page, uncomment ReCaptcha. Validate and
-                        replace 'PRIVATE_KEY' with your private key.
-                        Register for reCAPTCHA keys at <a href="http://recaptcha.net">reCAPTCHA.net</a>.
-                    </p>
+<!DOCTYPE html>
+<html lang="en">
+    <head> 
+        <meta charset="utf-8" />
+        <title>@Page.Title</title>
+        <script src='https://www.google.com/recaptcha/api.js'></script>
+    </head>
+    <body style="background-color: #f8f8f8">
+        <div class="container">
+           <div class="row">
+             <div class="col-lg-12">
+                <div class="content">
+                <div class="content-register">
+                    <h1>FriendlyZone</h1>
+                    <hr>
+                    <h3>Create a new account</h3>
+                    <a href="~/Account/Login">or Sign in here</a>
+                    <div class="reg-form">
+                    <form method="post">
+                    @AntiForgery.GetHtml()
+                    @* If at least one validation error exists, notify the user *@
+                    @Html.ValidationSummary("Account creation was unsuccessful. Please correct the errors and try again.", excludeFieldErrors: true, htmlAttributes: null)
+                    <fieldset> 
+                        <div class="field">
+                            <label for="username" @if(!ModelState.IsValidField("username")) {<text>class="error-label"</text>}>Username</label>
+                            <input type="text" id="username" name="username" value="@username" @Validation.For("username") />
+                            @*Write  any username validation errors to the page *@
+                            @Html.ValidationMessage("username")
+                        </div>
+                        <div class="field">
+                            <label for="email" @if(!ModelState.IsValidField("email")){<text>class="error-label"</text>}>Email address</label>
+                                <input type="text" id="email" name="email" value="@email" @Validation.For("email") />
+                                @* Write any email validation errors to the page *@
+                                @Html.ValidationMessage("email")
+                        </div>
+                        <div class="field">
+                            <label for="confirmEmail" @if(!ModelState.IsValidField("confirmEmail")) {<text>class="error-label"</text>}>Confirm email</label>
+                                <input type="text" id="confirmEmail" name="confirmEmail" @Validation.For("confirmEmail") />
+                                @* Write any password validation errors to the page *@
+                                @Html.ValidationMessage("confirmEmail")
+                        </div>
+                        <div class="field">
+                            <label for="password" @if(!ModelState.IsValidField("password")) {<text>class="error-label"</text>}>Password</label>
+                                <input type="password" id="password" name="password" @Validation.For("password") />
+                                @* Write any password validation errors to the page *@
+                                @Html.ValidationMessage("password")
+                        </div>
+                        <div class="field">
+                            <label for="confirmPassword" @if(!ModelState.IsValidField("confirmPassword")) {<text>class="error-label"</text>}>Confirm password</label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" @Validation.For("confirmPassword") />
+                                @* Write any password validation errors to the page *@
+                                @Html.ValidationMessage("confirmPassword")
+                        </div>
+                        <div class="recaptcha">  
+                                @ReCaptcha.GetHtml("6Ld4XB0TAAAAAHTBdyKptybsceoB6IrMwkAy5JWG", theme: "white")
+                                @Html.ValidationMessage("recaptcha")
+                        </div> 
+                        <br><input type="submit" value="Register" />
+                    </fieldset>
+                </form>
                 </div>
-                @* 
-                @ReCaptcha.GetHtml("PUBLIC_KEY", theme: "white")
-                @Html.ValidationMessage("recaptcha")
-                *@
-            </li>
-        </ol>
-        <input type="submit" value="Register" />
-    </fieldset>
-</form>
+               </div>
+               </div>
+             </div>
+          </div>
+        </div>
+    </body>
+</html>

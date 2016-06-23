@@ -1,27 +1,33 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>@Page.Title - My ASP.NET Web Page</title>
-        <link href="~/Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
-        <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+        <title>@Page.Title - FriendlyZone</title>
+        <link href="~/Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" /> 
+        <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />    
         <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+        <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+        <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
         <script src="~/Scripts/jquery-1.8.2.min.js"></script>
         <script src="~/Scripts/jquery-ui-1.8.24.js"></script>
-        <script src="~/Scripts/modernizr-2.6.2.js"></script>
+        <script src="~/Scripts/modernizr-2.6.2.js"></script>  
+       <!--  <script src="~/Scripts/confirmExit.js"></script>  --> 
         <meta name="viewport" content="width=device-width" />
     </head>
     <body>
         <header>
             <div class="content-wrapper">
                 <div class="float-left">
-                    <p class="site-title"><a href="~/">your logo here</a></p>
+                    <img src="~/Images/logo.png" alt="FriendlyZone">
                 </div>
                 <div class="float-right">
                     <section id="login">
                         @if (WebSecurity.IsAuthenticated) {
                             <text>
                                 Hello, <a class="email" href="~/Account/Manage" title="Manage">@WebSecurity.CurrentUserName</a>!
+                                <a href="~/Account/MyProfile" title="Profile">My Profile</a>
                                 <form id="logoutForm" action="~/Account/Logout" method="post">
                                     @AntiForgery.GetHtml()
                                     <a href="javascript:document.getElementById('logoutForm').submit()">Log out</a>
@@ -34,22 +40,24 @@
                             </ul>
                         }
                     </section>
-                    <nav>
-                        <ul id="menu">
-                            <li><a href="~/">Home</a></li>
-                            <!-- ENABLE ACCESS TO ACCOUNT AFTER LOG-IN -->
-                            @if (WebSecurity.IsAuthenticated) {
-                                <li><a href="~/Member">Member</a></li>
-                                <li><a href="~/Account/MyProfile">My Profile</a></li>
-                            }
-                            <li><a href="~/About">About</a></li>
-                            <li><a href="~/Contact">Contact</a></li>
-                            <!-- ADMIN ACCOUNT ACCESS ONLY -->
-                            @if (User.IsInRole("Admin")) {
-                                <li><a href="~/Admin">Admin</a></li>
-                            }
-                        </ul>
-                    </nav>
+                    <div class="wrap">
+                        <nav>
+                            <ul class="navbar">
+                                <li><a href="~/">Home</a></li>
+                                <!-- ENABLE ACCESS TO ACCOUNT AFTER LOG-IN -->
+                                @if (WebSecurity.IsAuthenticated) {
+                                    <li><a href="~/Member">Member</a></li> 
+                                }
+                                <li><a href="~/About">About</a></li>
+                                <li><a href="~/Contact">Contact</a></li>
+                                <!-- ADMIN ACCOUNT ACCESS ONLY -->
+                                @if (User.IsInRole("Admin")) {
+                                    <li><a href="~/Admin">Admin</a></li>
+                                }
+                            </ul>
+                        </nav>
+                    </div>
+                    
                 </div>
             </div>
         </header>

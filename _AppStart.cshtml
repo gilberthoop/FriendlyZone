@@ -1,4 +1,5 @@
-﻿@{
+﻿@using Microsoft.Web.Helpers;
+@{
     WebSecurity.InitializeDatabaseConnection("StarterSite", "UserProfile", "UserId", "Email", autoCreateTables: true);
 
     // To let users of this site log in using their accounts from other sites such as Microsoft, Facebook, Twitter,
@@ -25,4 +26,10 @@
     //WebMail.From = "your-name-here@example.com";
 
     // To learn how to optimize scripts and stylesheets in your site go to http://go.microsoft.com/fwlink/?LinkID=248973
+
+    // Add the PublicKey and PrivateKey strings with your public
+    // and private keys. Obtain your PublicKey and PrivateKey
+    // at the ReCaptcha.Net (http://recaptcha.net) website.
+    ReCaptcha.PublicKey = "6Ld4XB0TAAAAAHTBdyKptybsceoB6IrMwkAy5JWG";
+    ReCaptcha.PrivateKey = "6Ld4XB0TAAAAAB4x1GuYaHKhYtMMiU-3LSUxCTEe";
 }

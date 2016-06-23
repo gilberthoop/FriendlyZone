@@ -1,0 +1,77 @@
+﻿@{
+    // Check if user log-in is authenticated, if not redirect to the Log-in page
+    if (!WebSecurity.IsAuthenticated) {
+        Response.Redirect(@Href("~/Account/Login?returnUrl="+Request.Url.LocalPath));
+    }
+    // If user not the admin, display 404 ERROR
+    if (!User.IsInRole("Admin")) {
+        Response.Redirect("~/Error/Unauthorized");
+    }
+    Layout = "~/_MainLayout.cshtml";
+Page.Title = "Admin";
+    var db = Database.Open("StarterSite");
+    var selectQuery = "SELECT * FROM (UserProfile JOIN webpages_UsersInRoles ON UserProfile.UserId=webpages_UsersInRoles.UserId) JOIN webpages_Roles ON webpages_UsersInRoles.RoleId=webpages_Roles.RoleId ORDER BY MemberSince DESC";    
+Session["Test"] = "Testing Session Variables";
+    var myInfo = new List<string>{WebSecurity.CurrentUserName,DateTime.Now.ToLongDateString()};
+    Session["info"] = myInfo;
+    AppState["MyApplication"] = "My Application Variable";
+    
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Admin Page</title>
+        
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="content">
+                        <h1>Users</h1>
+                        <hr>
+                        <div class="table-member-info">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th> &nbsp;</th>
+                                        <th>&nbsp;</th>
+                                        <th>Profile picture </th>
+                                        <th>ID</th>
+                                        <th>UserName</th>
+                                        <th>Email</th>
+                                        <th>Member Since</th>
+                                        <th>Role</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach(var row in db.Query(selectQuery)) {
+                                        var imagePath = Request.ApplicationPath + row.ProfilePicture;
+                                        Response.Cookies["UserInfo"]["ProfilePicture"] = imagePath;
+                                        Response.Cookies["UserInfo"]["UserName"] = row.UserName;
+                                        Response.Cookies["UserInfo"].Value = "User Information";
+                                        Response.Cookies["UserInfo"]["Email"] = row.Email;
+                                        Response.Cookies["UserInfo"]["Time"] = DateTime.Now.ToLongDateString();
+                                        <tr>
+                                            <td><a href="@Href("~/Admin/DeleteUser.cshtml",row.UserId)">Delete</a></td>
+                                            <td><a href="@Href("~/Admin/EditUser.cshtml",row.UserId)">Edit</a></td>
+                                            <td><img src=@imagePath alt="Me" class="dp"></td>
+                                            <td>@row.UserId</td>
+                                            <td>@row.UserName</td>
+                                            <td>@row.Email</td>
+                                            <td>@row.MemberSince</td>
+                                            <td>@row.RoleName</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>  
+                        </div>  
+                    </div>
+                </div>
+            </div>
+        </div>
+   </body>
+</html>

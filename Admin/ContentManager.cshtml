@@ -1,0 +1,71 @@
+﻿@{
+    // Check if user log-in is authenticated, if not redirect to the Log-in page
+    if (!WebSecurity.IsAuthenticated) {
+        Response.Redirect(@Href("~/Account/Login?returnUrl="+Request.Url.LocalPath));
+    }
+    // If user not the admin, display 404 ERROR
+    if (!User.IsInRole("Admin")) {
+        Response.Redirect("~/Error/Unauthorized");
+    }
+    Layout = "~/_MainLayout.cshtml";
+Page.Title = "Admin";
+    var db = Database.Open("StarterSite");
+    var selectQueryString = "SELECT * FROM (MemberComments JOIN UserProfile ON MemberComments.UserId=UserProfile.UserId)";
+Session["Test"] = "Testing Session Variables";
+    var myInfo = new List<string>{WebSecurity.CurrentUserName,DateTime.Now.ToLongDateString()};
+    Session["info"] = myInfo;
+    AppState["MyApplication"] = "My Application Variable";
+    
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Admin Page</title>
+     </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="content">
+                        <h1>Posts</h1>
+                        <hr>
+                        <div class="table-member-info">
+                            <table>
+                            <thead>
+                                <tr>
+                                    <th>&nbsp;</th> 
+                                    <th>Profile picture </th>
+                                    <th>UserName</th>
+                                    <th>Message</th>
+                                    <th>Date Posted</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(var row in db.Query(selectQueryString)) {
+                                    var imagePath = Request.ApplicationPath + row.ProfilePicture;
+                                    Response.Cookies["UserInfo"]["ProfilePicture"] = imagePath;
+                                    Response.Cookies["UserInfo"]["UserName"] = row.UserName;
+                                    Response.Cookies["UserInfo"]["Message"] = " User Message";
+                                    Response.Cookies["UserInfo"]["Time"] = DateTime.Now.ToLongDateString();
+                                    <tr>
+                                        <td><a href="@Href("~/Admin/DeleteMessage.cshtml",row.UserId)">Delete</a></td>
+                                        <td><img src=@imagePath alt="Me" class="dp" ></td>
+                                        <td>@row.UserName</td>
+                                        <td>@row.Message</td>
+                                        <td>@row.Time</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+
+    

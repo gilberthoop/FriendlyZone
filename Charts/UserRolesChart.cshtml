@@ -1,0 +1,25 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+
+    var db = Database.Open("StarterSite");
+
+  var data = db.Query("SELECT  RoleId,UserId FROM webpages_UsersInRoles "); // Queries users in roles by if 
+  
+
+    var myChart = new Chart(width: 600, height: 400, theme:ChartTheme.Green);
+        myChart.AddTitle("User ID and Role ID: Where x is users and y is role (1-Admin, 2-Member");
+        myChart.DataBindTable(dataSource: data, xField: "UserId");
+        myChart.Write();
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+    </head>
+    <body>
+        
+    </body>
+</html>
