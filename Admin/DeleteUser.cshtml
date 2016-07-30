@@ -5,7 +5,9 @@
     if (!User.IsInRole("Admin")) {
         Response.Redirect("~/404");
     }
-     Layout = "~/_SiteLayout.cshtml";
+     //Layout = "~/_SiteLayout.cshtml";
+     Layout = "~/_MainLayout.cshtml";
+
      var db = Database.Open("StarterSite");
      var userID = UrlData[0];
 
@@ -22,7 +24,7 @@
          db.Execute(deleteUser,userID);
          db.Execute(deleteQuery,userID);
         
-         Response.Redirect("~/Admin.cshtml");
+         Response.Redirect("~/Admin/UserManager.cshtml");
      }   
 }
 

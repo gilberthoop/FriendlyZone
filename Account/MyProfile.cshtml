@@ -8,16 +8,27 @@
 
     <!-- WORK WITH DATA -->
     var db = Database.Open("StarterSite"); 
-    var name = ""; 
+    //var name = ""; 
+    var id = 0;
 
-    var selectUserName = "SELECT UserName FROM UserProfile WHERE IsLoggedIn=1";
+    /*var selectUserName = "SELECT UserName FROM UserProfile WHERE IsLoggedIn=1";
     foreach(var getUser in db.Query(selectUserName)) {
         name = getUser.UserName; 
+    }*/
+
+    var selectUser = "SELECT UserId FROM UserProfile WHERE IsLoggedIn=1";
+    
+    foreach(var getUser in db.Query(selectUser)) {
+        id = getUser.UserId;
     }
 
-    var selectQueryString = "SELECT * FROM UserProfile WHERE UserName=@0";
-    var row = db.QuerySingle(selectQueryString,name);
 
+    //var selectQueryString = "SELECT * FROM UserProfile WHERE UserName=@0";
+    //var row = db.QuerySingle(selectQueryString,name);
+    var selectQueryString = "SELECT * FROM UserProfile WHERE UserId=@0";
+    var row = db.QuerySingle(selectQueryString,id);
+
+    var userid = row.UserId;
     var username = row.UserName;
     var email = row.Email;
     var memberSince = row.MemberSince;
@@ -41,9 +52,12 @@
                     <div>
                         <img src="@imagePath" alt="@username" class="dp">
                     </div>
-                    <br><a href="@Href("~/Account/UpdateProfile",name)">Edit/Update Profile</a>
+                    <br><p><a href="@Href("~/Account/UpdateProfile",id)">Edit/Update Profile</a></p>
+                    <p>
+                        <a href="~/Account/Manage">Click here to change your password</a>
+                    </p>
                     <hr> 
-                    <!-- DISPLAY PROFILE INFO IN TABULAR FORM -->
+                    <!-- DISPLAY PROFILE INFO IN TABULAR FORM
                     <div class="table-info">
                         <table>
                             <thead>
@@ -61,6 +75,15 @@
                                     </tr>
                             </tbody>
                         </table>
+                    </div>  -->
+                    <div class="container">
+                        <div class="list-group">
+                            <li class="list-group-item">Username: @username</li>
+                            <li class="list-group-item">Email: @email</li>
+                            <li class="list-group-item">Member since: @memberSince</li>
+                        </div>
+                    </div><div class="col-md-9">
+                        
                     </div>
                  </div>
               </div>

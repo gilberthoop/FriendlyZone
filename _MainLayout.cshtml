@@ -6,6 +6,8 @@
         <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 	    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 	    <link href="http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+        <link href='https://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
 
 	    <link rel="stylesheet" type="text/css" href="~/styles/app.css"> 
         <meta charset="utf-8" />
@@ -30,42 +32,45 @@
                 <li id="home"><a href="~/">Home</a></li>
                 <!-- ENABLE ACCESS TO ACCOUNT AFTER LOG-IN -->
                 @if (WebSecurity.IsAuthenticated) {
-                       <li class="dropdown">
+                     <!--  <li class="dropdown">
                             <button class="dropbtn">My Account</button>
                             <div class="dropdown-content">
                                 <a href="~/Account/MyProfile">My Profile</a>
                                 <a href="~/Account/Manage">Manage Account</a>
                             </div> 
-                        </li> 
+                        </li> -->
+                        <li id="myaccount"><a href="~/Account/MyProfile">My Account</a></li>
                         <li id="member"><a href="~/Member">Member</a></li> 
                 }
                 <li id="about"><a href="~/About">About</a></li>
                 <li id="contact"><a href="~/Contact">Contact</a></li>
                 <!-- ADMIN ACCOUNT ACCESS ONLY -->
                 @if (User.IsInRole("Admin")) {
-                    <li class="dropdown">
+                    <!-- <li class="dropdown">
                         <button class="dropbtn">Admin</button>
                         <div class="dropdown-content">
                             <a href="~/Admin">Main Page</a>
                             <a href="~/Admin/UserManager">Users Management</a>
                             <a href="~/Admin/ContentManager">Content Management</a>
                         </div> 
-                    </li>
+                    </li> -->
+                    <li><a href="~/Admin">Admin</a></li>
                 }
               </ul>
               <ul class="nav navbar-nav navbar-right">
                   @if (WebSecurity.IsAuthenticated) {
-                        <li><a href="~/Account/Manage" title="Manage">Hello,  @WebSecurity.CurrentUserName!</a></li>
+                        <li><a href="~/Account/MyProfile" title="Manage">Hello,  @WebSecurity.CurrentUserName!</a></li>
                         <li>
                             <form id="logoutForm" action="~/Account/Logout" method="post">
                                     @AntiForgery.GetHtml()
-                                    <a href="javascript:document.getElementById('logoutForm').submit()">Log out</a>
-                             </form> 
-                        </li>    
+                                    <br><a href="javascript:document.getElementById('logoutForm').submit()">Log out</a>
+                                  <!--  <input type="submit" name="logout" value="Log out"> --> 
+                             </form>  
+                        </li> 
                         } else {
-                                <li><a href="~/Account/Register">Register <i class="fa fa-user-plus"></i></a></li>
-                                <li><a href="~/Account/Login">Log in <i class="fa fa-user"></i></a></li> 
-                        } 
+                            <li><a href="~/Account/Register">Register <i class="fa fa-user-plus"></i></a></li>
+                            <li><a href="~/Account/Login">Log in <i class="fa fa-user"></i></a></li> 
+                        }
                </ul>
             </div>
           </div>
@@ -80,13 +85,29 @@
         <footer class="copyright" style="text-align: center">
             <div class="content-wrapper">
                 <div class="float-left">
-                    <p>&copy; @DateTime.Now.Year - My ASP.NET Web Page</p>
+                    <p>&copy; @DateTime.Now.Year - William Gilbert Go</p>
                 </div>
             </div>
         </footer>
         @RenderSection("Scripts", required: false)
+
+
+        @if (Session[WebSecurity.CurrentUserName] == null) {
+            // if session has expired submit a post request to logout the user
+                Session.Abandon();
+                <script>
+                    $.post("~/Account/Logout");
+                </script>
+            }
          
      <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.js"></script>
+     <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
      <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+     <script>
+         $(window).unload(function () {
+             alert("Have a nice day!");
+         });
+     </script>
     </body>
 </html>

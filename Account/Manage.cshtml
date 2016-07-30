@@ -107,63 +107,58 @@
 }
 <div class="container">
    <div class="row">
-      <div class="col-lg-12">
-         <div class="content">
-         <div class="content-register">
-             <h1>@Page.Title.</h1>
-             <i class="fa fa-users" style="font-size: 100px"></i>
-             <br><br>
-             @if (!successMessage.IsEmpty()) {
-                <p class="message-success">
-                    @successMessage
-                </p>
-             }
+      <div class="col-lg-12"> 
+         <div class="container"> 
+             <header class="jumbotron" style="text-align: center"> 
+                 <h2>@Page.Title.</h2>
+                 <i class="fa fa-users" style="font-size: 100px"></i>
+                 <br><br>
+                 @if (!successMessage.IsEmpty()) {
+                    <p class="message-success">
+                        @successMessage
+                    </p>
+                 }
 
-             <p>You're logged in as <strong>@WebSecurity.CurrentUserName</strong>.</p>
+                 <p>You're logged in as <strong>@WebSecurity.CurrentUserName</strong>.</p>
 
-             @if (hasLocalAccount) {
-                <h3>Change password</h3>
-             } else {
-                <p>
-                    You do not have a local password for this site. Add a local password so you can log in without an external login.
-                </p>
-             } 
-
-            <div class="manage-form">
+                 @if (hasLocalAccount) {
+                    <h3>Change password</h3>
+                 } else {
+                    <p>
+                        You do not have a local password for this site. Add a local password so you can log in without an external login.
+                    </p>
+                 } 
+                  
                 <form method="post">
                     @AntiForgery.GetHtml()
                     @Html.ValidationSummary(excludeFieldErrors: true)
 
                     <fieldset>
                         <p style="color: white;font-size: 16pt;padding-left: 50px">
-                        @if (hasLocalAccount) {
-                            <p>Change Password Form</p>
-                        } else {
+                        @if (!hasLocalAccount) {
                             <p>Set Password Form</p>
                         }
                         </p> 
                             @if (hasLocalAccount) {
                                 <div class="field">
-                                    <label for="currentPassword" @if (!ModelState.IsValidField("currentPassword")) {<text>class="error-label"</text>}>Current password</label>
-                                    <input type="password" id="currentPassword" name="currentPassword" @Validation.For("currentPassword")/>
+                                    <label for="currentPassword" @if (!ModelState.IsValidField("currentPassword")) {<text>class="error-label"</text>}></label>
+                                    <input type="password" id="currentPassword" name="currentPassword" placeholder="Current Password" @Validation.For("currentPassword")/>
                                     @Html.ValidationMessage("currentPassword")
                                 </div>
                             }
                             <div class="field">
-                                <label for="newPassword" @if (!ModelState.IsValidField("newPassword")) {<text>class="error-label"</text>}>New password</label>
-                                <input type="password" id="newPassword" name="newPassword" @Validation.For("newPassword")/>
+                                <label for="newPassword" @if (!ModelState.IsValidField("newPassword")) {<text>class="error-label"</text>}></label>
+                                <input type="password" id="newPassword" name="newPassword" placeholder="New Password" @Validation.For("newPassword")/>
                                 @Html.ValidationMessage("newPassword")
                             </div>
                             <div class="field">
-                                <label for="confirmPassword" @if (!ModelState.IsValidField("confirmPassword")) {<text>class="error-label"</text>}>Confirm new password</label>
-                                <input type="password" id="confirmPassword" name="confirmPassword" @Validation.For("confirmPassword")/>
+                                <label for="confirmPassword" @if (!ModelState.IsValidField("confirmPassword")) {<text>class="error-label"</text>}></label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm new password" @Validation.For("confirmPassword")/>
                                 @Html.ValidationMessage("confirmPassword")
                             </div> 
-                        @if (hasLocalAccount) {
-                            <p style="padding-left: 25%">
-                            <input type="submit" name="action" value="Change Password"> 
-                            </p>
-                            <p style="text-align: center">
+                        @if (hasLocalAccount) { 
+                            <input type="submit" name="action" value="Change Password">  
+                            <p style="text-align: center; padding-top: 20px;">
                                 Click <a href="~/Account/ForgotPassword" title="Forgot password page"><em>here</em></a> if you've forgotten your password.
                             </p>
                         } else {
@@ -172,10 +167,7 @@
                             </p>
                         }
                     </fieldset>
-                </form>
-            </div> 
-
-
+                </form>  
             <section id="externalLogins">
                 @if (externalLogins.Count > 0) {
                     <h3>Registered external logins</h3>
@@ -204,11 +196,11 @@
                         </tbody>
                     </table>
                 } 
-                <h3>Add an external login</h3>
-                @RenderPage("~/Account/_ExternalLoginsList.cshtml")
+            <!--  <h3>Add an external login</h3> RenderPage("~/Account/_ExternalLoginsList.cshtml") -->
+                
             </section>
-         </div>
-         </div>
+            </header> 
+         </div> 
       </div>
    </div>
 </div> 

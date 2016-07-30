@@ -95,7 +95,7 @@
                         <hr>
                         <!-- MOST FOLLOWED TRACKER -->
                         <div id="follow">
-                            <p><img src="~/Images/gold_star.png" alt="gold star" height="30" width="35"><b>Most Followed:</b>
+                            <p><img src="~/Images/gold_star.png" alt="gold star" height="30" width="35"><b> Most Followed:</b>
                              @{
                                 var mostFollowed = "";
                                 var selectMostFollowed = "SELECT UserName FROM (MemberComments JOIN UserProfile ON MemberComments.UserId=UserProfile.UserId)" +
@@ -106,7 +106,7 @@
                              }
                                 @mostFollowed 
                             </p>
-                            <p><img src="~/Images/trophy_icon.png" alt="trophy" height="30" width="30"><b>Top Contributor:</b>
+                            <p><img src="~/Images/trophy_icon.png" alt="trophy" height="30" width="30"><b> Top Contributor:</b>
                              @{  
                                  //Calculate and select the top contributor by username
                                 var topContributor = ""; 
@@ -119,35 +119,36 @@
                             </p>
                         </div>  
                     </div> 
-                </div>
-            </div>
-            <div class="table-member-info">
-             <!-- TABULAR FORM OF DISCUSSIONS-->
-            <table>
-                    <tr>
-                        <th>Member picture</th>
-                        <th>Name</th>
-                        <th>Time</th> 
-                        <th>Comments</th>
-                        <th>&nbsp;</th> 
-                    </tr>
-                @foreach(var row in db.Query(selectQueryString)) {
-                    var imagePath = Request.ApplicationPath + row.ProfilePicture;
-                    <tr>
-                        <td><img src="@imagePath" class="dp" alt="@row.UserName"></td>
-                        <td>@row.UserName</td>
-                        <td>@row.Time</td>
-                        <td>@row.Message</td>
-                        <td> 
-                            <form id="following" action="~/FollowMe/@row.UserId" method="POST"> 
-                                @AntiForgery.GetHtml()
-                                <a href="javascript:document.getElementById('following').submit()">Follow</a>  
-                            </form>
-                        </td>
-                    </tr>
-                }
-            </table>
-            </div>
+                </div> 
+            </div> 
+
+            <div class="container">
+                <div class="well table-info table">
+                    <div class="row">
+                        <div class="col-md-12"> 
+                         <!-- TABULAR FORM OF DISCUSSIONS-->  
+                            <table> 
+                            @foreach(var row in db.Query(selectQueryString)) {
+                                var imagePath = Request.ApplicationPath + row.ProfilePicture;
+                                <tr>
+                                    <td><img src="@imagePath" class="dp" alt="@row.UserName"></td>
+                                    <td>@row.UserName</td>
+                                    <td>@row.Time</td>
+                                    <td>@row.Message</td>
+                                    <td> 
+                                        <form id="following" action="~/FollowMe/@row.UserId" method="POST"> 
+                                            @AntiForgery.GetHtml()
+                                            <a href="javascript:document.getElementById('following').submit()">Follow</a>  
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                            </table>
+                             
+                         </div>
+                      </div>
+                  </div>
+            </div> 
         </div>
         
     </body>

@@ -5,7 +5,8 @@
     if (!User.IsInRole("Admin")) {
         Response.Redirect("~/404");
     }
-    Layout = "~/_SiteLayout.cshtml";
+    //Layout = "~/_SiteLayout.cshtml";
+    Layout = "~/_MainLayout.cshtml";
     
     var db = Database.Open("StarterSite");
     var userID = UrlData[0];
@@ -29,7 +30,7 @@
        if (ModelState.IsValid) {
            var updateQueryString = "UPDATE UserProfile SET UserName=@0 WHERE UserId=@1";
             db.Execute(updateQueryString,UserName,UserID);
-            Response.Redirect(@Href("~/Admin.cshtml"));
+            Response.Redirect(@Href("~/Admin/UserManager.cshtml"));
        }
    }
 }
