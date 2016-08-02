@@ -1,29 +1,26 @@
-﻿@* Remove this section if you are using bundling *@
+﻿
 @section Scripts {
     <script src="~/Scripts/jquery.validate.min.js"></script>
     <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
 }
 
 @{
-    Layout = "~/_MainLayout.cshtml";
-    Page.Title = "Log in";
-
     // Initialize general page variables
-    var email = "";
-    var password = "";
+    var theemail = "";
+    var thepassword = "";
     var rememberMe = false;
     var isloggedin = true;
 
     var returnUrl = Request.QueryString["ReturnUrl"];
     if (returnUrl.IsEmpty()) {
         // Some external login providers always require a return URL value
-        returnUrl = Href("~/");
+        returnUrl = Href("~/Member");
     }
 
     // Setup validation
-    Validation.RequireField("email", "You must specify an email address.");
-    Validation.RequireField("password", "You must specify a password.");
-    Validation.Add("password",
+    Validation.RequireField("theemail", "You must specify an email address.");
+    Validation.RequireField("thepassword", "You must specify a password.");
+    Validation.Add("thepassword",
         Validator.StringLength(
             maxLength: Int32.MaxValue,
             minLength: 6,
@@ -38,17 +35,17 @@
             OAuthWebSecurity.RequestAuthentication(provider, Href("~/Account/RegisterService", new { returnUrl }));
             return;
         } else if (Validation.IsValid()) {
-            email = Request.Form["email"];
-            password = Request.Form["password"];
+            theemail = Request.Form["theemail"];
+            thepassword = Request.Form["thepassword"];
             rememberMe = Request.Form["rememberMe"].AsBool();
 
-            if (WebSecurity.UserExists(email) && WebSecurity.GetPasswordFailuresSinceLastSuccess(email) > 4 && WebSecurity.GetLastPasswordFailureDate(email).AddSeconds(60) > DateTime.UtcNow) {
+            if (WebSecurity.UserExists(theemail) && WebSecurity.GetPasswordFailuresSinceLastSuccess(theemail) > 4 && WebSecurity.GetLastPasswordFailureDate(theemail).AddSeconds(60) > DateTime.UtcNow) {
                 Response.Redirect("~/Account/AccountLockedOut");
                 return;
             }
 
             // Attempt to log in using provided credentials
-            if (WebSecurity.Login(email, password, rememberMe)) {
+            if (WebSecurity.Login(theemail, thepassword, rememberMe)) {
                 // TODO
                 // Set the IsLoggedIn Field to False when user logs out
                 isloggedin = false;
@@ -56,7 +53,7 @@
               //  var userLoggedIn = db.QuerySingle("SELECT Email FROM UserProfile WHERE LOWER(Email) = LOWER(@0)", email);
               //  db.Execute("UPDATE UserProfile SET IsLoggedIn=1 WHERE Email")          
               //  db.Execute("INSERT INTO UserProfile (Email, UserName, IsLoggedIn) VALUES (@0, @1, @2)", email,username,isLoggedIn);
-                var updateQueryString = "UPDATE UserProfile SET IsLoggedIn=1 WHERE Email= '" + email + "' ";   
+                var updateQueryString = "UPDATE UserProfile SET IsLoggedIn=1 WHERE Email= '" + theemail + "' ";   
                 // ->NEVER DO THIS, PRONE TO SQL INJECTION
                 // Must prevent SQL injection atacks by using parameters
                 db.Execute(updateQueryString);
@@ -69,53 +66,3 @@
         }
     }
 }
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>@Page.Title</title>
-    </head>
-    <body style="background-color: #f8f8f8">
-        <div class="container">
-           <div class="row">
-             <div class="col-lg-12">
-                <div class="content">
-                <div class="content-login">
-                    <h1>FriendlyZone</h1>
-                    <hr>
-                    <h3>Log in</h3>
-                    <form method="post">
-                    @AntiForgery.GetHtml()
-                    @* If one or more validation errors exist, show an error *@
-                    @Html.ValidationSummary("Log in was unsuccessful. Please correct the errors and try again.", excludeFieldErrors: true, htmlAttributes: null)
-                    <fieldset>
-                        <div class="text-comment">
-                            <label for="email" @if (!ModelState.IsValidField("email"))
-                                                               {<text>class="error-label"</text>}></label><br>
-                            <input type="text" id="email" placeholder="Email" name="email" value="@email" @Validation.For("email")/><br>
-                            @* Write any user name validation errors to the page *@
-                            @Html.ValidationMessage("email")
-                        </div>
-                        <div class="text-comment">
-                            <label for="password" @if (!ModelState.IsValidField("password")) {<text>class="error-label"</text>}></label><br>
-                            <input type="password" id="password" placeholder="Password" name="password" @Validation.For("password")/><br>
-                            @* Write any password validation errors to the page *@
-                            @Html.ValidationMessage("password")
-                        </div>
-                        <div id="rememberMe"><br>
-                            Remember me  <input type="checkbox" id="rememberMe" name="rememberMe" value="true" checked="@rememberMe" /><br><br>
-                            <input type="submit" value="Log in" />
-                        </div> 
-                    </fieldset>
-                    </form>
-                    <p><br>
-                        <a href="~/Account/Register">Don't have a Account?</a>
-                        <a href="~/Account/ForgotPassword">Did you forget your password?</a>
-                   </p>
-               </div>
-               </div>
-             </div>
-          </div>
-        </div>
-    </body>
-</html>

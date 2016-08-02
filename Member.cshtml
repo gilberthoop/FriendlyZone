@@ -76,14 +76,14 @@
         <div class="container">  
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="content">
+                    <div class="contents">
                         @{
                             var test = "";  
                         }
                         <!-- TEXT INPUT FIELD FOR DISCUSSION-->
                         <form method="POST">
                             <div class="text-comment"> 
-                                <input type="text" name="comment" placeholder="What are you doing?" style="height: 100px; width: 500px">
+                                <textarea cols='60' rows='8' name="comment" placeholder="What are you doing?"></textarea>
                                 <br><br>
                             </div>
                             <div>
@@ -138,7 +138,7 @@
                                     <td> 
                                         <form id="following" action="~/FollowMe/@row.UserId" method="POST"> 
                                             @AntiForgery.GetHtml()
-                                            <a href="javascript:document.getElementById('following').submit()">Follow</a>  
+                                            <!--a href="javascript:document.getElementById('following').submit()">Follow</a -->  
                                         </form>
                                     </td>
                                 </tr>

@@ -5,7 +5,7 @@
 }
 
 @{
-    Layout = "~/_MainLayout.cshtml";
+  //  Layout = "~/_MainLayout.cshtml";
     Page.Title = "Register";
 
     /* 
@@ -98,7 +98,7 @@
                         // Navigate back to the homepage and exit
                         WebSecurity.Login(email, password);
 
-                        Response.Redirect("~/");
+                        Response.Redirect("~/Member");
                     }
                 } catch (System.Web.Security.MembershipCreateUserException e) {
                     ModelState.AddFormError(e.Message);
@@ -114,68 +114,146 @@
 <!DOCTYPE html>
 <html lang="en">
     <head> 
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+	    <link href="http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+        <link href='https://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="~/styles/app.css"> 
+
+        <meta charset="utf-8" /> 
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charset="utf-8" />
+
         <title>@Page.Title</title>
         <script src='https://www.google.com/recaptcha/api.js'></script>
     </head>
-    <body style="background-color: #f8f8f8">
-        <div class="container">
-           <div class="row">
-             <div class="col-lg-12">
-                <div class="content">
-                <div class="content-register">
-                    <h1>FriendlyZone</h1>
-                    <hr>
-                    <h3>Create a new account</h3>
-                    <a href="~/Account/Login">or Sign in here</a>
-                    <div class="reg-form">
-                    <form method="post">
-                    @AntiForgery.GetHtml()
-                    @* If at least one validation error exists, notify the user *@
-                    @Html.ValidationSummary("Account creation was unsuccessful. Please correct the errors and try again.", excludeFieldErrors: true, htmlAttributes: null)
-                    <fieldset> 
-                        <div class="field">
-                            <label for="username" @if(!ModelState.IsValidField("username")) {<text>class="error-label"</text>}>Username</label>
-                            <input type="text" id="username" name="username" value="@username" @Validation.For("username") />
-                            @*Write  any username validation errors to the page *@
-                            @Html.ValidationMessage("username")
-                        </div>
-                        <div class="field">
-                            <label for="email" @if(!ModelState.IsValidField("email")){<text>class="error-label"</text>}>Email address</label>
-                                <input type="text" id="email" name="email" value="@email" @Validation.For("email") />
-                                @* Write any email validation errors to the page *@
-                                @Html.ValidationMessage("email")
-                        </div>
-                        <div class="field">
-                            <label for="confirmEmail" @if(!ModelState.IsValidField("confirmEmail")) {<text>class="error-label"</text>}>Confirm email</label>
-                                <input type="text" id="confirmEmail" name="confirmEmail" @Validation.For("confirmEmail") />
-                                @* Write any password validation errors to the page *@
-                                @Html.ValidationMessage("confirmEmail")
-                        </div>
-                        <div class="field">
-                            <label for="password" @if(!ModelState.IsValidField("password")) {<text>class="error-label"</text>}>Password</label>
-                                <input type="password" id="password" name="password" @Validation.For("password") />
-                                @* Write any password validation errors to the page *@
-                                @Html.ValidationMessage("password")
-                        </div>
-                        <div class="field">
-                            <label for="confirmPassword" @if(!ModelState.IsValidField("confirmPassword")) {<text>class="error-label"</text>}>Confirm password</label>
-                                <input type="password" id="confirmPassword" name="confirmPassword" @Validation.For("confirmPassword") />
-                                @* Write any password validation errors to the page *@
-                                @Html.ValidationMessage("confirmPassword")
-                        </div>
-                        <div class="recaptcha">  
-                                @ReCaptcha.GetHtml("6Ld4XB0TAAAAAHTBdyKptybsceoB6IrMwkAy5JWG", theme: "white")
-                                @Html.ValidationMessage("recaptcha")
-                        </div> 
-                        <br><input type="submit" value="Register" />
-                    </fieldset>
-                </form>
-                </div>
+    <body>
+        <nav class="navbar navbar-default navbar-fixed-top">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <i class="fa fa-users" style="font-size: 45px;color: #12466d"></i>
+              <a class="navbar-brand" href="~/">FriendlyZone</a>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+              <ul class="nav navbar-nav" id="nav">
+                <li id="home"><a href="~/">Home</a></li>
+                <!-- ENABLE ACCESS TO ACCOUNT AFTER LOG-IN -->
+                @if (WebSecurity.IsAuthenticated) { 
+                        <li id="myaccount"><a href="~/Account/MyProfile">My Account</a></li>
+                        <li id="member"><a href="~/Member">Member</a></li> 
+                }
+                <li id="about"><a href="~/About">About</a></li>
+                <li id="contact"><a href="~/Contact">Contact</a></li>
+                <!-- ADMIN ACCOUNT ACCESS ONLY -->
+                @if (User.IsInRole("Admin")) { 
+                    <li><a href="~/Admin">Admin</a></li>
+                }
+              </ul>
+              <div class="nav navbar-nav navbar-right">
+                  @if (WebSecurity.IsAuthenticated) {
+                        <li><a href="~/Account/MyProfile" title="Manage">Hello,  @WebSecurity.CurrentUserName!</a></li>
+                        <li>
+                            <form id="logoutForm" action="~/Account/Logout" method="post">
+                                    @AntiForgery.GetHtml() 
+                                <p style="padding-left: 30px;">
+                                    <a class="btn btn-success navbar-form navbar-right" href="javascript:document.getElementById('logoutForm').submit()" style="color: white;">Log out</a>
+                                  <!--  <input type="submit" name="logout" value="Log out"> --> 
+                                </p>
+                             </form>  
+                        </li> 
+                        } 
                </div>
-               </div>
-             </div>
+            </div>
           </div>
+         </nav>
+
+        <div id="body"> 
+            <section class="content-wrapper main-content clear-fix">
+                <div class="container">
+                   <div class="row" style="padding-top: 90px;"> 
+                         <div class="col-md-6 col-md-offset-3 center">
+                            <h1 style="text-align: center">Friendly Zone</h1>
+                            <hr>
+                            <h3>Create a new account</h3> 
+                                <form action="~/Account/Register" method="post">
+                                @AntiForgery.GetHtml()
+                                @* If at least one validation error exists, notify the user *@
+                                @Html.ValidationSummary("Account creation was unsuccessful. Please correct the errors and try again.", excludeFieldErrors: true, htmlAttributes: null)
+                                <fieldset> 
+                                    <div class="field">
+                                        <label for="username" @if(!ModelState.IsValidField("username")) {<text>class="error-label"</text>}></label>
+                                        <input type="text" id="username" name="username" value="@username" @Validation.For("username") placeholder="Username" />
+                                        @*Write  any username validation errors to the page *@
+                                        @Html.ValidationMessage("username")
+                                    </div>
+                                    <div class="field">
+                                        <label for="email" @if(!ModelState.IsValidField("email")){<text>class="error-label"</text>}></label>
+                                            <input type="text" id="email" name="email" value="@email" @Validation.For("email") placeholder="Email address" />
+                                            @* Write any email validation errors to the page *@
+                                            @Html.ValidationMessage("email")
+                                    </div>
+                                    <div class="field">
+                                        <label for="confirmEmail" @if(!ModelState.IsValidField("confirmEmail")) {<text>class="error-label"</text>}></label>
+                                            <input type="text" id="confirmEmail" name="confirmEmail" @Validation.For("confirmEmail") placeholder="Confirm email" />
+                                            @* Write any password validation errors to the page *@
+                                            @Html.ValidationMessage("confirmEmail")
+                                    </div>
+                                    <div class="field">
+                                        <label for="password" @if(!ModelState.IsValidField("password")) {<text>class="error-label"</text>}></label>
+                                            <input type="password" id="password" name="password" @Validation.For("password") placeholder="Password" />
+                                            @* Write any password validation errors to the page *@
+                                            @Html.ValidationMessage("password")
+                                    </div>
+                                    <div class="field">
+                                        <label for="confirmPassword" @if(!ModelState.IsValidField("confirmPassword")) {<text>class="error-label"</text>}></label>
+                                            <input type="password" id="confirmPassword" name="confirmPassword" @Validation.For("confirmPassword") placeholder="Confirm password" />
+                                            @* Write any password validation errors to the page *@
+                                            @Html.ValidationMessage("confirmPassword")
+                                    </div>
+                                    <div class="recaptcha">  
+                                            @ReCaptcha.GetHtml("6Ld4XB0TAAAAAHTBdyKptybsceoB6IrMwkAy5JWG", theme: "white")
+                                            @Html.ValidationMessage("recaptcha")
+                                    </div> 
+                                    <br><input type="submit" value="Register" />
+                                </fieldset>
+                            </form> 
+                      </div>
+                   </div>
+                </div>
+            </section>
         </div>
+        <footer class="copyright" style="text-align: center">
+            <div class="content-wrapper">
+                <div class="float-left">
+                    <p>&copy; @DateTime.Now.Year - William Gilbert Go</p>
+                </div>
+            </div>
+        </footer> 
+         
+          @if (Session[WebSecurity.CurrentUserName] == null) {
+                // if session has expired submit a post request to logout the user
+                    Session.Abandon();
+                    <script>
+                        $.post("~/Account/Logout");
+                    </script>
+                }
+         
+         <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.js"></script>
+         <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+         <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+         <script>
+             $(window).unload(function () {
+                 alert("Have a nice day!");
+             });
+         </script>
     </body>
 </html>

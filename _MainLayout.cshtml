@@ -1,6 +1,73 @@
 ﻿
-<!DOCTYPE html>
+@section Scripts {
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+}
 
+@{
+    // Initialize general page variables
+    var theemail = "";
+    var thepassword = "";
+    var rememberMe = false;
+    var isloggedin = true;
+
+    var returnUrl = Request.QueryString["ReturnUrl"];
+    if (returnUrl.IsEmpty()) {
+        // Some external login providers always require a return URL value
+        returnUrl = Href("~/Member");
+    }
+
+    // Setup validation
+    Validation.RequireField("theemail", "You must specify an email address.");
+    Validation.RequireField("thepassword", "You must specify a password.");
+    Validation.Add("thepassword",
+        Validator.StringLength(
+            maxLength: Int32.MaxValue,
+            minLength: 6,
+            errorMessage: "Password must be at least 6 characters"));
+
+    // If this is a POST request, validate and process data
+    if (IsPost) {
+        AntiForgery.Validate();
+        // is this an external login request?
+        string provider = Request.Form["provider"];
+        if (!provider.IsEmpty()) {
+            OAuthWebSecurity.RequestAuthentication(provider, Href("~/Account/RegisterService", new { returnUrl }));
+            return;
+        } else if (Validation.IsValid()) {
+            theemail = Request.Form["theemail"];
+            thepassword = Request.Form["thepassword"];
+            rememberMe = Request.Form["rememberMe"].AsBool();
+
+            if (WebSecurity.UserExists(theemail) && WebSecurity.GetPasswordFailuresSinceLastSuccess(theemail) > 4 && WebSecurity.GetLastPasswordFailureDate(theemail).AddSeconds(60) > DateTime.UtcNow) {
+                Response.Redirect("~/Account/AccountLockedOut");
+                return;
+            }
+
+            // Attempt to log in using provided credentials
+            if (WebSecurity.Login(theemail, thepassword, rememberMe)) {
+                // TODO
+                // Set the IsLoggedIn Field to False when user logs out
+                isloggedin = false;
+                var db = Database.Open("StarterSite");
+              //  var userLoggedIn = db.QuerySingle("SELECT Email FROM UserProfile WHERE LOWER(Email) = LOWER(@0)", email);
+              //  db.Execute("UPDATE UserProfile SET IsLoggedIn=1 WHERE Email")          
+              //  db.Execute("INSERT INTO UserProfile (Email, UserName, IsLoggedIn) VALUES (@0, @1, @2)", email,username,isLoggedIn);
+                var updateQueryString = "UPDATE UserProfile SET IsLoggedIn=1 WHERE Email= '" + theemail + "' ";   
+                // ->NEVER DO THIS, PRONE TO SQL INJECTION
+                // Must prevent SQL injection atacks by using parameters
+                db.Execute(updateQueryString);
+
+                Context.RedirectLocal(returnUrl);
+                return;
+            } else {
+                ModelState.AddFormError("The user name or password provided is incorrect.");
+            }
+        }
+    }
+}
+
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -10,9 +77,10 @@
         <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
 
 	    <link rel="stylesheet" type="text/css" href="~/styles/app.css"> 
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width-device-width, initial-scale=1.0" />
-        <title>@Page.Title - FriendlyZone</title>
+        <meta charset="utf-8" /> 
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>@Page.Title - Friendly Zone</title>
     </head>
     <body>
          <nav class="navbar navbar-default navbar-fixed-top">
@@ -31,47 +99,48 @@
               <ul class="nav navbar-nav" id="nav">
                 <li id="home"><a href="~/">Home</a></li>
                 <!-- ENABLE ACCESS TO ACCOUNT AFTER LOG-IN -->
-                @if (WebSecurity.IsAuthenticated) {
-                     <!--  <li class="dropdown">
-                            <button class="dropbtn">My Account</button>
-                            <div class="dropdown-content">
-                                <a href="~/Account/MyProfile">My Profile</a>
-                                <a href="~/Account/Manage">Manage Account</a>
-                            </div> 
-                        </li> -->
+                @if (WebSecurity.IsAuthenticated) { 
                         <li id="myaccount"><a href="~/Account/MyProfile">My Account</a></li>
                         <li id="member"><a href="~/Member">Member</a></li> 
                 }
                 <li id="about"><a href="~/About">About</a></li>
                 <li id="contact"><a href="~/Contact">Contact</a></li>
                 <!-- ADMIN ACCOUNT ACCESS ONLY -->
-                @if (User.IsInRole("Admin")) {
-                    <!-- <li class="dropdown">
-                        <button class="dropbtn">Admin</button>
-                        <div class="dropdown-content">
-                            <a href="~/Admin">Main Page</a>
-                            <a href="~/Admin/UserManager">Users Management</a>
-                            <a href="~/Admin/ContentManager">Content Management</a>
-                        </div> 
-                    </li> -->
+                @if (User.IsInRole("Admin")) { 
                     <li><a href="~/Admin">Admin</a></li>
                 }
               </ul>
-              <ul class="nav navbar-nav navbar-right">
+              <div class="nav navbar-nav navbar-right">
                   @if (WebSecurity.IsAuthenticated) {
                         <li><a href="~/Account/MyProfile" title="Manage">Hello,  @WebSecurity.CurrentUserName!</a></li>
                         <li>
                             <form id="logoutForm" action="~/Account/Logout" method="post">
-                                    @AntiForgery.GetHtml()
-                                    <br><a href="javascript:document.getElementById('logoutForm').submit()">Log out</a>
+                                    @AntiForgery.GetHtml() 
+                                <p style="padding-left: 30px;">
+                                    <a class="btn btn-success navbar-form navbar-right" href="javascript:document.getElementById('logoutForm').submit()" style="color: white;">Log out</a>
                                   <!--  <input type="submit" name="logout" value="Log out"> --> 
+                                </p>
                              </form>  
                         </li> 
                         } else {
-                            <li><a href="~/Account/Register">Register <i class="fa fa-user-plus"></i></a></li>
-                            <li><a href="~/Account/Login">Log in <i class="fa fa-user"></i></a></li> 
+                            <form class="navbar-form navbar-right" action="" method="POST">
+                                @AntiForgery.GetHtml()
+                                @Html.ValidationSummary("Log in was unsuccessful. Please correct the errors and try again.", excludeFieldErrors: true, htmlAttributes: null)
+                                <div class="form-group">  
+                                    <input class="form-control" type="text" id="theemail" placeholder="Email" name="theemail" value="@theemail" @Validation.For("theemail")/>
+                                    @Html.ValidationMessage("theemail")
+                                </div>
+                                <div class="form-group">  
+                                    <input class="form-control" type="password" id="thepassword" placeholder="Password" name="thepassword" @Validation.For("thepassword")/>
+                                    @Html.ValidationMessage("thepassword")
+                                </div>
+                                <input type="submit" name="submit" value="Log in" class="btn btn-success short-button"> 
+                            </form> 
+                             
+                            <!--br> <a href="~/Account/Register">Register <i class="fa fa-user-plus"></i></a> 
+                            <a href="~/Account/Login">Log in <i class="fa fa-user"></i></a>  -->
                         }
-               </ul>
+               </div>
             </div>
           </div>
          </nav>
@@ -82,6 +151,8 @@
                 @RenderBody()
             </section>
         </div>
+
+
         <footer class="copyright" style="text-align: center">
             <div class="content-wrapper">
                 <div class="float-left">

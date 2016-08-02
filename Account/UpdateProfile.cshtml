@@ -40,8 +40,9 @@
     var selectQueryString = "SELECT * FROM UserProfile WHERE UserId=@0";
     var row = db.QuerySingle(selectQueryString,id);
 
-    var username = row.UserName;
+    
     var userid = row.UserId;
+    var username = row.UserName;
     var currentImage = Request.ApplicationPath + row.ProfilePicture;
     var checkLog = row.IsLoggedIn; 
 
@@ -79,7 +80,7 @@
    <body>
      <div class="container">
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-md-6 col-md-offset-3 center">
                 <div class="content"> 
                     <h1>Update Profile</h1>
                     <h3>@username</h3>
