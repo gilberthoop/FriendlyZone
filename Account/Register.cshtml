@@ -26,6 +26,7 @@
     var confirmPassword = "";
     var profilePicture = "";
     var isLoggedIn = false;
+    var followCount = 0;
 
     // Setup validation
     Validation.RequireField("userName", "Please enter your username");
@@ -51,6 +52,7 @@
         confirmPassword = Request.Form["confirmPassword"];
         profilePicture = "Images/default-profile.png";
         isLoggedIn = true;
+        followCount = 0;
 
         // Validate the user's captcha answer
          if (!ReCaptcha.Validate("6Ld4XB0TAAAAAB4x1GuYaHKhYtMMiU-3LSUxCTEe")) {
@@ -72,6 +74,10 @@
                 var userResult = db.QuerySingle("SELECT * FROM UserProfile WHERE LOWER(Email) = LOWER(@0)", email);
                 var roleResult = db.QuerySingle("SELECT RoleId FROM webpages_Roles WHERE RoleName=@0","Member");
                 db.Execute("INSERT INTO webpages_UsersInRoles (UserId,RoleId) Values (@0,@1)", userResult.UserId,roleResult.RoleId);
+
+
+                // Insert the initial follow count of the newly registered account
+                db.Execute("INSERT INTO Followers (UserId,FollowCount) VALUES (@0,@1)", userResult.UserId, followCount);
 
 
 

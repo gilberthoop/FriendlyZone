@@ -52,30 +52,11 @@
                     <div>
                         <img src="@imagePath" alt="@username" class="dp">
                     </div>
-                    <br><p><a href="@Href("~/Account/UpdateProfile",id)">Edit/Update Profile</a></p>
+                    <br><p><a class="btn btn-info" href="@Href("~/Account/UpdateProfile",id)">Edit/Update Profile</a></p>
                     <p>
-                        <a href="~/Account/Manage">Click here to change your password</a>
+                        <a class="btn btn-info" href="~/Account/Manage">Click here to change your password</a>
                     </p>
-                    <hr> 
-                    <!-- DISPLAY PROFILE INFO IN TABULAR FORM
-                    <div class="table-info">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Member Since</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                    <tr>
-                                        <td>@username</td>
-                                        <td>@email</td>
-                                        <td>@memberSince</td>
-                                    </tr>
-                            </tbody>
-                        </table>
-                    </div>  -->
+                    <hr>  
                     <div class="container">
                         <div class="list-group">
                             <li class="list-group-item">Username: @username</li>

@@ -21,21 +21,14 @@
      }
 
     <!-- WORK WITH DATA -->
-    var db = Database.Open("StarterSite");
-    //var name = UrlData[0];
+    var db = Database.Open("StarterSite"); 
     var id = UrlData[0];
 
-    /*if(name.IsEmpty()) {
-        Response.Redirect(@Href("~/Account/EditProfile"));
-    }*/
 
     if(id.IsEmpty()) {
         Response.Redirect(@Href("~/Account/EditProfile"));
     }
 
-
-    //var selectQueryString = "SELECT * FROM UserProfile WHERE UserName=@0";
-    //var row = db.QuerySingle(selectQueryString, name);
 
     var selectQueryString = "SELECT * FROM UserProfile WHERE UserId=@0";
     var row = db.QuerySingle(selectQueryString,id);
@@ -60,8 +53,6 @@
         
       var image = imagePath;
        if (ModelState.IsValid) {
-          // var updateQueryString = "UPDATE UserProfile SET UserName=@0, ProfilePicture=@1 WHERE UserName=@2"
-          // db.Execute(updateQueryString,username,imagePath,name);;
            var updateQueryString = "UPDATE UserProfile SET UserName=@0, ProfilePicture=@1 WHERE UserId=@2";
            db.Execute(updateQueryString, username, imagePath, id);
            Response.Redirect(@Href("~/Account/MyProfile.cshtml"));
@@ -100,10 +91,8 @@
                                     <input type="file" name="profilePicture" >
                                 </div> 
                                 <div class="field">
-                                    <a href="@Href("~/Account/MyProfile",id)">
-                                        <input type="button" value="Cancel">
-                                    </a>
-                                    <input type="submit" value="Update Profile">
+                                    <input class="btn btn-info" type="submit" value="Update Profile">
+                                    <a class="btn btn-warning" href="@Href("~/Account/MyProfile",id)">Cancel</a>
                                 </div> 
                                 
                             </fieldset>

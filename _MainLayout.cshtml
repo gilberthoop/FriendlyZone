@@ -117,7 +117,7 @@
                             <form id="logoutForm" action="~/Account/Logout" method="post">
                                     @AntiForgery.GetHtml() 
                                 <p style="padding-left: 30px;">
-                                    <a class="btn btn-success navbar-form navbar-right" href="javascript:document.getElementById('logoutForm').submit()" style="color: white;">Log out</a>
+                                    <a class="btn btn-warning navbar-form navbar-right" href="javascript:document.getElementById('logoutForm').submit()" style="color: white;">Log out</a>
                                   <!--  <input type="submit" name="logout" value="Log out"> --> 
                                 </p>
                              </form>  
@@ -134,7 +134,7 @@
                                     <input class="form-control" type="password" id="thepassword" placeholder="Password" name="thepassword" @Validation.For("thepassword")/>
                                     @Html.ValidationMessage("thepassword")
                                 </div>
-                                <input type="submit" name="submit" value="Log in" class="btn btn-success short-button"> 
+                                <input type="submit" name="submit" value="Log in" class="btn btn-info short-button"> 
                             </form> 
                              
                             <!--br> <a href="~/Account/Register">Register <i class="fa fa-user-plus"></i></a> 

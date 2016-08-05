@@ -89,7 +89,7 @@
                             <div>
                                 @{ test = "false"; }
                                 <input type="hidden" name="test" value="@test">
-                                <input type="submit" name="postmessage" value="Post Message">
+                                <input type="submit" name="postmessage" value="Post Message" class="btn btn-info">
                             </div>
                         </form>
                         <hr>
@@ -136,10 +136,7 @@
                                     <td>@row.Time</td>
                                     <td>@row.Message</td>
                                     <td> 
-                                        <form id="following" action="~/FollowMe/@row.UserId" method="POST"> 
-                                            @AntiForgery.GetHtml()
-                                            <!--a href="javascript:document.getElementById('following').submit()">Follow</a -->  
-                                        </form>
+                                        <a class="btn btn-info" href="@Href("~/FollowMe",@row.UserId)">Follow</a>
                                     </td>
                                 </tr>
                             }
