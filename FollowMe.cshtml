@@ -1,31 +1,49 @@
 ﻿@{
-    WebSecurity.RequireAuthenticatedUser();
-    var followCount = 0;
-    var id = UrlData[0];
-    if (IsPost) {
-        // Verify the request was submitted by the user
-        AntiForgery.Validate();
-         
+        Layout = "~/_MainLayout.cshtml";
+        WebSecurity.RequireAuthenticatedUser(); 
+
         // Open DB
         var db = Database.Open("StarterSite"); 
+        var id = UrlData[0]; 
 
-        // Get the current followers of the user
+
+        var selectUserQuery = "SELECT * FROM (UserProfile JOIN Followers ON UserProfile.UserId = Followers.UserId) WHERE UserProfile.UserId=@0";
+        var row = db.QuerySingle(selectUserQuery,id);
+        var username = row.UserName;
+
+
+        // Get the current followers of the user 
         var getFollowers = "SELECT FollowCount FROM Followers WHERE UserId = @0";
         var user = db.QuerySingle(getFollowers,id);
-        followCount = user.FollowCount;
+        var followCount = user.FollowCount;
 
-        // Increment the follow count
-        followCount++;
 
-        // Update the number of followers
-        var updateFollowCount = "UPDATE Followers SET FollowCount=@0 WHERE UserId=@1";
-        db.Execute(updateFollowCount, followCount, id);
+        if (IsPost) {
+            // Increment the follow count
+            followCount++;
 
-        // Redirect back to the return URL or homepage
-        var returnUrl = "~/Member.cshtml";
-        Context.RedirectLocal(returnUrl);
-    } else {
-        Response.Redirect("~/");
-    }
+            // Update the number of followers 
+            var updateFollowCount = "UPDATE Followers SET FollowCount=@0 WHERE UserId=@1";
+            db.Execute(updateFollowCount, followCount, id);
+
+            // Redirect back to the Members page
+            Response.Redirect("~/Member.cshtml");
+        }
+
      
 }
+
+
+<div id="container">
+   <div class="row">
+       <div class="col-md-6 col-md-offset-3 center"> 
+           <h1 style="padding-top:90px;">Confirmation</h1>
+           <hr><br>
+           <form method="post" action=""> 
+               <p>Follow @username  ?</p>
+               <p><input type="submit" value="Follow" class="btn btn-info" size="4"></p>
+               <a href="~/Member.cshtml" class="btn btn-warning">Cancel</a>
+           </form>
+        </div>
+    </div>
+</div>
