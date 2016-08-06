@@ -14,25 +14,33 @@
     if(userID.IsEmpty()) {
         Response.Redirect(@Href("~/Admin"));
     }
+
+    var UserName = "";
+    var UserID = 0;
+
     var selectQueryString = "SELECT * FROM UserProfile WHERE UserId=@0";
     var row = db.QuerySingle(selectQueryString,userID); 
 
-    var UserName = row.UserName;
-    var UserID = row.UserId;
+    if (row == null) {
+        Response.Redirect("~/Error/Forbidden");
+    } else {
+         UserName = row.UserName;
+         UserID = row.UserId;
 
-       if (IsPost) {
-       UserName = Request["username"];
-       if (String.IsNullOrEmpty(UserName)) {
-           ModelState.AddError("UserName","UserName is required");
-       }
-
-       // insert data into database
-       if (ModelState.IsValid) {
-           var updateQueryString = "UPDATE UserProfile SET UserName=@0 WHERE UserId=@1";
-            db.Execute(updateQueryString,UserName,UserID);
-            Response.Redirect(@Href("~/Admin/UserManager.cshtml"));
-       }
-   }
+           if (IsPost) {
+               UserName = Request["username"];
+               if (String.IsNullOrEmpty(UserName)) {
+                   ModelState.AddError("UserName","UserName is required");
+                } 
+           // insert data into database
+           if (ModelState.IsValid) {
+               var updateQueryString = "UPDATE UserProfile SET UserName=@0 WHERE UserId=@1";
+                db.Execute(updateQueryString,UserName,UserID);
+                Response.Redirect(@Href("~/Admin/UserManager.cshtml"));
+                }
+            } 
+     }
+     
 }
 
 <!DOCTYPE html>

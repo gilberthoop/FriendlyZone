@@ -10,21 +10,14 @@
     var db = Database.Open("StarterSite"); 
     //var name = ""; 
     var id = 0;
+     
 
-    /*var selectUserName = "SELECT UserName FROM UserProfile WHERE IsLoggedIn=1";
-    foreach(var getUser in db.Query(selectUserName)) {
-        name = getUser.UserName; 
-    }*/
-
-    var selectUser = "SELECT UserId FROM UserProfile WHERE IsLoggedIn=1";
-    
+    var selectUser = "SELECT UserId FROM UserProfile WHERE IsLoggedIn=1";  
     foreach(var getUser in db.Query(selectUser)) {
         id = getUser.UserId;
     }
+     
 
-
-    //var selectQueryString = "SELECT * FROM UserProfile WHERE UserName=@0";
-    //var row = db.QuerySingle(selectQueryString,name);
     var selectQueryString = "SELECT * FROM UserProfile WHERE UserId=@0";
     var row = db.QuerySingle(selectQueryString,id);
 
@@ -32,9 +25,9 @@
     var username = row.UserName;
     var email = row.Email;
     var memberSince = row.MemberSince;
-    var imagePath = Request.ApplicationPath + row.ProfilePicture;
-    
+    var imagePath = Request.ApplicationPath + row.ProfilePicture;    
  }
+
 
 <!DOCTYPE html>
 <html lang="en">

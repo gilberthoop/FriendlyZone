@@ -4,8 +4,7 @@
     }
     if (!User.IsInRole("Admin")) {
         Response.Redirect("~/404");
-    }
-     //Layout = "~/_SiteLayout.cshtml";
+    } 
      Layout = "~/_MainLayout.cshtml";
 
      var db = Database.Open("StarterSite");
@@ -15,17 +14,22 @@
          Response.Redirect(@Href("~/Admin"));
      }
 
+
      var row = db.QuerySingle("SELECT * FROM UserProfile WHERE UserId=@0", userID);
 
-     if (IsPost && !userID.IsEmpty()) {
-         var deleteUser = "DELETE FROM webpages_UsersInRoles WHERE UserId=@0";
-         var deleteQuery = "DELETE FROM UserProfile WHERE UserId=@0";
+     if (row == null) {
+         Response.Redirect("~/Error/Forbidden");
+     } else {
+         if (IsPost && !userID.IsEmpty()) {
+             var deleteUser = "DELETE FROM webpages_UsersInRoles WHERE UserId=@0";
+             var deleteQuery = "DELETE FROM UserProfile WHERE UserId=@0";
          
-         db.Execute(deleteUser,userID);
-         db.Execute(deleteQuery,userID);
+             db.Execute(deleteUser,userID);
+             db.Execute(deleteQuery,userID);
         
-         Response.Redirect("~/Admin/UserManager.cshtml");
-     }   
+             Response.Redirect("~/Admin/UserManager.cshtml");
+         }  
+     } 
 }
 
 <!DOCTYPE html>

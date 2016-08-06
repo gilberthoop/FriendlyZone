@@ -26,38 +26,49 @@
 
 
     if(id.IsEmpty()) {
-        Response.Redirect(@Href("~/Account/EditProfile"));
+        Response.Redirect(@Href("~/Account/MyProfile"));
     }
 
+
+        var userid = 0;
+        var username = "";
+        var currentImage = "";
+        var checkLog = false;
 
     var selectQueryString = "SELECT * FROM UserProfile WHERE UserId=@0";
     var row = db.QuerySingle(selectQueryString,id);
+    
+    if (row == null) {
+        Response.Redirect(@Href("~/Error/NotFound"));
+    }
+    else {
+         userid = row.UserId;
+         username = row.UserName;
+         currentImage = Request.ApplicationPath + row.ProfilePicture;
+         checkLog = row.IsLoggedIn;   
+        
+        // Redirect to the error page if the user tries to access others account
+        if (checkLog == false) {
+            Response.Redirect(@Href("~/Error/Forbidden"));
+        }
+
+        if (IsPost) {
+           username = Request["username"];
+           if (String.IsNullOrEmpty(username)) {
+               ModelState.AddError("username","Username name is required");
+           }
+        
+          var image = imagePath;
+           if (ModelState.IsValid) {
+               var updateQueryString = "UPDATE UserProfile SET UserName=@0, ProfilePicture=@1 WHERE UserId=@2";
+               db.Execute(updateQueryString, username, imagePath, id);
+               Response.Redirect(@Href("~/Account/MyProfile.cshtml"));
+           } 
+        } 
+    }
+
 
     
-    var userid = row.UserId;
-    var username = row.UserName;
-    var currentImage = Request.ApplicationPath + row.ProfilePicture;
-    var checkLog = row.IsLoggedIn; 
-
-
-    // Redirect to the error page if the user tries to access others account
-    if (checkLog == false) {
-        Response.Redirect(@Href("~/Error/Forbidden"));
-    }
-
-    if (IsPost) {
-       username = Request["username"];
-       if (String.IsNullOrEmpty(username)) {
-           ModelState.AddError("username","Username name is required");
-       }
-        
-      var image = imagePath;
-       if (ModelState.IsValid) {
-           var updateQueryString = "UPDATE UserProfile SET UserName=@0, ProfilePicture=@1 WHERE UserId=@2";
-           db.Execute(updateQueryString, username, imagePath, id);
-           Response.Redirect(@Href("~/Account/MyProfile.cshtml"));
-       } 
-    }
     
 }
 

@@ -17,15 +17,19 @@
 
      var row = db.QuerySingle("SELECT * FROM UserProfile WHERE UserId=@0", userID);
 
-     if (IsPost && !userID.IsEmpty()) {
-         var deleteMessage = "DELETE FROM MemberComments WHERE UserId=@0";
+     if (row == null) {
+         Response.Redirect("~/Error/Forbidden");
+     } else {
+         if (IsPost && !userID.IsEmpty()) {
+             var deleteMessage = "DELETE FROM MemberComments WHERE UserId=@0";
         
          
-         db.Execute(deleteMessage,userID);
+             db.Execute(deleteMessage,userID);
          
         
-         Response.Redirect("~/Admin/ContentManager.cshtml");
-     }   
+             Response.Redirect("~/Admin/ContentManager.cshtml");
+         }  
+     } 
 }
 
 
